@@ -2,21 +2,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from web.models.user import UserProfile
+from web.models.friend import Friend
 
 
-class GetUserInfoView(APIView):
+class RemoveFriendView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request):
+    def post(self, request):
         try:
-            user = request.user
-            user_profile = UserProfile.objects.get(user=user)
+            friend_id = request.data['friend_id']
+            Friend.objects.filter(id=friend_id, me__user=request.user).delete()
             return Response({
                 'result': 'success',
-                'user_id': user.id,
-                'username': user.username,
-                'photo': user_profile.photo.url,
-                'profile': user_profile.profile,
             })
         except:
             return Response({
